@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 80;
 const mongo = require('mongodb').MongoClient;
 
 var uri = "mongodb://newuser:new1234@cluster0-shard-00-00.ojp2i.mongodb.net:27017,cluster0-shard-00-01.ojp2i.mongodb.net:27017,cluster0-shard-00-02.ojp2i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-lv2098-shard-0&authSource=admin&retryWrites=true&w=majority";
