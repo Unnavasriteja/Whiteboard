@@ -24,7 +24,7 @@ async function run() {
 			changeStream.on('change', next => {
 				console.log("hola")
 				socket.emit('init', next);
-				socket.broadcast.emit('paint', data);
+				socket.broadcast.emit('paint', next);
 
 			});
 			const cursor = paint.find();
