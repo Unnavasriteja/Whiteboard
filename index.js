@@ -14,16 +14,18 @@ async function run() {
 		await client.connect();
 		const database = client.db('myFirstDatabase');
 		const paint = database.collection('paint');
-		// Query for a movie that has the title 'Back to the Future'
-		const changeStream = paint.watch();
-		
+		// Query for a movie that has the title 'Back to the Future'		
 
 		app.use(express.static(__dirname + '/public'));
 
 		async function onConnection(socket) {
 			console.log('client connected');
+			const changeStream = paint.watch();
 			changeStream.on('change', next => {
+				console.log("hola")
 				socket.emit('init', next);
+				socket.broadcast.emit('paint', data);
+
 			});
 			const cursor = paint.find();
 			if ((await cursor.count()) === 0) {
