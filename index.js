@@ -23,7 +23,6 @@ async function run() {
 			const changeStream = paint.watch();
 			changeStream.on('change', next => {
 				console.log("hola")
-				socket.emit('init', next);
 				socket.broadcast.emit('paint', next);
 
 			});
