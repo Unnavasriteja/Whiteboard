@@ -3,36 +3,58 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 80;
-const mongo = require('mongodb').MongoClient;
+const { MongoClient } = require("mongodb");
 
-var uri = "mongodb://newuser:new1234@cluster0-shard-00-00.ojp2i.mongodb.net:27017,cluster0-shard-00-01.ojp2i.mongodb.net:27017,cluster0-shard-00-02.ojp2i.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-lv2098-shard-0&authSource=admin&retryWrites=true&w=majority";
+var uri = "mongodb+srv://newuser:new1234@cluster0.ojp2i.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 
-mongo.connect(uri, (error, db) => {
-	if (error) throw error;
-	console.log('Connected to DB');
-	app.use(express.static(__dirname + '/public'));
+const client = new MongoClient(uri);
 
-	function onConnection(socket) {
-		console.log('client connected');
-		db.collection('paint').find().sort({timestamp:1}).toArray((error, result) => {
-			socket.emit('init', result);
-			if (error) console.error(error);
-		});
+async function run() {
+	try {
+		await client.connect();
+		const database = client.db('myFirstDatabase');
+		const paint = database.collection('paint');
+		// Query for a movie that has the title 'Back to the Future'
+		const changeStream = paint.watch();
+		
 
-		socket.on('paint', (data) => {
-			data.timestamp = new Date();
-			db.collection('paint').save(data, (error, result) => {
-				if (error) console.log(error);
+		app.use(express.static(__dirname + '/public'));
+
+		async function onConnection(socket) {
+			console.log('client connected');
+			changeStream.on('change', next => {
+				socket.emit('init', next);
 			});
-			socket.broadcast.emit('paint', data);
-		});
-		socket.on('clearall',()=>{
-			db.collection('paint').remove();
-			socket.broadcast.emit('paint',"clearit");
-		})
+			const cursor = paint.find();
+			if ((await cursor.count()) === 0) {
+				console.log("No documents found!");
+			}
+			await cursor.sort({timestamp:1}).toArray((error, result) => {
+				socket.emit('init', result);
+				if (error) console.error(error);
+			});
+
+
+			await socket.on('paint', async (data) => {
+				data.timestamp = new Date();
+				//console.log(data)
+				const result = await paint.insertOne(data);
+				console.log(`${result.insertedCount} documents were inserted`);
+
+				socket.broadcast.emit('paint', data);
+			});
+
+			await socket.on('clearall',async ()=>{
+				await paint.drop();
+				socket.broadcast.emit('paint',"clearit");
+			})
+		}
+
+		io.on('connection', onConnection);
+
+		http.listen(port, () => console.log('running on port ' + port));
+	} finally {
+	  // Ensures that the client will close when you finish/error
 	}
-
-	io.on('connection', onConnection);
-
-	http.listen(port, () => console.log('running on port ' + port));
-});
+  }
+  run().catch(console.dir);
