@@ -125,10 +125,14 @@
     //console.log(data);
     if(data==="clearit"){
       window.location.reload();
+      drawings=[]
+      redraw();
     }
-    var w = canvas.width;
-    var h = canvas.height;
-    drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.color);
+    else{
+      var w = canvas.width;
+      var h = canvas.height;
+      drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.color);
+    }
   }
 
   function onRefresh(data){
