@@ -21,9 +21,9 @@ async function run() {
 		async function onConnection(socket) {
 			console.log('client connected');
 			const changeStream = paint.watch();
-			changeStream.on('change', next => {
-				console.log("hola")
-				socket.broadcast.emit('paint', next);
+			await changeStream.on('change', async next => {
+				//console.log(next.fullDocument)
+				await socket.broadcast.emit('paint', next.fullDocument);
 
 			});
 			const cursor = paint.find();
@@ -31,6 +31,7 @@ async function run() {
 				console.log("No documents found!");
 			}
 			await cursor.sort({timestamp:1}).toArray((error, result) => {
+				//console.log(result)
 				socket.emit('init', result);
 				if (error) console.error(error);
 			});
