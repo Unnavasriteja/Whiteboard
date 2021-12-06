@@ -124,7 +124,6 @@
   function onDrawingEvent(data) {
     //console.log(data);
     if(data==="clearit"){
-      window.location.reload();
       drawings=[]
       redraw();
     }
