@@ -148,6 +148,7 @@
   function redraw() {
     var w = canvas.width;
     var h = canvas.height;
+    if(drawings!==undefined)
     for (i = 0; i < drawings.length; i++) {
       drawLine(drawings[i].x0 * w, drawings[i].y0 * h, drawings[i].x1 * w, drawings[i].y1 * h, drawings[i].color);
     }
