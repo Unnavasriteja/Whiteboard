@@ -76,9 +76,9 @@
     socket.emit("clearall");
     console.log("button pressed");
     socket.emit('paint',{});
-    drawings.push({});
+    drawings=[]
     redraw();
-    window.location.reload();
+    //window.location.reload();
   }
   function onMouseDown(e){
     drawing = true;
