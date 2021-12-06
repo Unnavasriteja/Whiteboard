@@ -122,7 +122,7 @@
   }
 
   function onDrawingEvent(data) {
-    console.log(data);
+    //console.log(data);
     if(data==="clearit"){
       window.location.reload();
     }
