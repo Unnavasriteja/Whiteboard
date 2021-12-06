@@ -21,9 +21,9 @@ async function run() {
 		async function onConnection(socket) {
 			console.log('client connected');
 			const changeStream = paint.watch();
-			await changeStream.on('change', async next => {
+			changeStream.on('change', next => {
 				//console.log(next.fullDocument)
-				await socket.broadcast.emit('paint', next.fullDocument);
+				socket.broadcast.emit('paint', next.fullDocument);
 
 			});
 			const cursor = paint.find();
